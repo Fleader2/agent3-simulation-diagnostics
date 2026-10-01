@@ -7,7 +7,7 @@ traceable, mechanistic models of microbial metabolism.
 
 Agent 3 consumes the executable Antimony model produced by **Agent 2 — Antimony Builder** (a
 separate repository, `agent2-antimony-builder`), simulates it deterministically, and produces a
-structured diagnostic report for **Agent 4 — Calibration** (not yet built).
+structured diagnostic report for **Agent 4 — Calibration** (`agent4-calibration-estimator`).
 
 **Central rule:** Agent 3 analyzes the model it is given; it does not invent biology, silently
 repair parameters, or recalibrate the model. If the model fails, Agent 3 reports and traces the
@@ -22,7 +22,11 @@ Agent 3 does **not**:
 - critique a model's biological plausibility in the full sense Agent 5 will.
 
 Agent 3 consumes Agent 2's output through an explicit, versioned handoff contract (a plain,
-JSON-serializable dict) — it never imports Agent 2's runtime code.
+JSON-serializable dict) — it never imports Agent 2's runtime code. That contract is the one
+canonical `agent2-downstream-v1` shape Agent 2's own `run_agent2_pipeline` entrypoint emits and
+every downstream agent consumes unchanged (Five-Agent Workflow V1 Hardening increment) — see
+the sibling `five-agent-integration-harness` repository's own
+`docs/00_five_agent_workflow_v1_architecture.md` for the full Version 1 system map.
 
 See `docs/01_agent3_responsibility_boundary.md`, `docs/02_agent2_to_agent3_contract.md`, and
 `docs/03_diagnostic_semantics.md` for full detail.
