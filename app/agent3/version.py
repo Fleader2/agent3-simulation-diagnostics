@@ -7,10 +7,14 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
 
 * ``AGENT3_CONTRACT_VERSION`` -- the version of Agent 3's own output contract
   (``app.agent3.types``: ``Agent3Report`` and the rest).
-* ``AGENT2_HANDOFF_CONTRACT_VERSION`` -- the version of the Agent 2 -> Agent 3 handoff
+* ``AGENT2_HANDOFF_CONTRACT_VERSION`` -- the version of the Agent 2 downstream handoff
   contract this repository was built against (``app.agent3.handoff``, ``docs/
-  02_agent2_to_agent3_contract.md``). Not a guarantee that every Agent 2 contract version is
-  compatible -- version reconciliation is deferred, exactly as the Agent 1 -> Agent 2
+  02_agent2_to_agent3_contract.md``). Five-Agent Workflow V1 Hardening increment: this is now
+  ``"agent2-downstream-v1"``, the one canonical name Agent 2's own
+  ``AGENT2_DOWNSTREAM_CONTRACT_VERSION`` emits and Agents 3, 4, and 5 all consume unchanged --
+  replacing this repository's own previously-divergent ``"agent2-to-agent3-v1"`` name for what
+  was already the identical real artifact shape. Not a guarantee that every Agent 2 contract
+  version is compatible -- version reconciliation is deferred, exactly as the Agent 1 -> Agent 2
   boundary's own ``AGENT1_HANDOFF_VERSION`` documents.
 * ``SIMULATION_POLICY_VERSION`` -- the version of the baseline-simulation configuration
   policy (integrator choice, tolerances, default horizon/step count).
@@ -23,7 +27,7 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
 from __future__ import annotations
 
 AGENT3_CONTRACT_VERSION = "0.1"
-AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-to-agent3-v1"
+AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-downstream-v1"
 SIMULATION_POLICY_VERSION = "simulation-v1"
 DIAGNOSTIC_POLICY_VERSION = "diagnostic-v1"
 PERTURBATION_POLICY_VERSION = "perturbation-v1"

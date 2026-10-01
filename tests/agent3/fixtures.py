@@ -90,7 +90,7 @@ def minimal_handoff_dict(**overrides) -> dict:
     need the full real ``sce00061`` fixture. One reaction, one species, one parameter, one
     model assumption -- enough to exercise provenance tracing end to end."""
     base = {
-        "contract_version": "agent2-to-agent3-v1",
+        "contract_version": "agent2-downstream-v1",
         "model_id": "test-model-1",
         "network_id": "test-network-1",
         "antimony_text": VALID_DECAY_ANTIMONY,

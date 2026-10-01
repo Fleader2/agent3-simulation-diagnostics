@@ -1,4 +1,4 @@
-# Agent 2 → Agent 3 Contract (`agent2-to-agent3-v1`)
+# Agent 2 → Agent 3 Contract (`agent2-downstream-v1`)
 
 This is the smallest stable input shape Agent 3 Version 1 requires from Agent 2, expressed as a
 plain, JSON-serializable dict (`app.agent3.handoff.parse_agent2_handoff` parses and validates it
@@ -9,11 +9,18 @@ boundary pattern (`app.agent2.handoff.translate_agent1_view_to_agent2` on the si
 `agent2-antimony-builder` repository) exactly. The two packages are decoupled at the code level;
 only this documented data shape is shared, by convention.
 
+**Five-Agent Workflow V1 Hardening increment:** this contract's own version name was
+`"agent2-to-agent3-v1"` prior to this increment. It is now `"agent2-downstream-v1"` — the one
+canonical name Agent 2's own `AGENT2_DOWNSTREAM_CONTRACT_VERSION`
+(`app.agent2.pipeline.build_canonical_downstream_handoff` in `agent2-antimony-builder`) emits,
+and the exact same name Agents 4 and 5 now also expect for what has always been the identical
+real artifact shape. The shape itself is unchanged by this rename.
+
 ## Top-level fields
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `contract_version` | str | yes | Compared informationally against `app.agent3.version.AGENT2_HANDOFF_CONTRACT_VERSION` (`"agent2-to-agent3-v1"`). A mismatch is disclosed as a note on the report, never raised as an error — version reconciliation is deferred, exactly as the Agent 1 → Agent 2 boundary's own `AGENT1_HANDOFF_VERSION` precedent. |
+| `contract_version` | str | yes | Compared informationally against `app.agent3.version.AGENT2_HANDOFF_CONTRACT_VERSION` (`"agent2-downstream-v1"`). A mismatch is disclosed as a note on the report, never raised as an error — version reconciliation is deferred, exactly as the Agent 1 → Agent 2 boundary's own `AGENT1_HANDOFF_VERSION` precedent. |
 | `model_id` | str | yes | Agent 2's own model identifier, carried through verbatim onto `Agent3Report.agent2_model_id`. |
 | `network_id` | str | yes | Agent 2's own network identifier. |
 | `antimony_text` | str | yes | The actual, compilable Antimony source. The *only* field handed to the simulation engine itself; everything else is metadata for provenance/diagnostics. |

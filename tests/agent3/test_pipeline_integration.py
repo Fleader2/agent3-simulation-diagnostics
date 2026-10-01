@@ -2,7 +2,9 @@
 
 This is the one test module allowed to be genuinely slow/real (it runs the full baseline
 workflow, including 10 perturbation smoke tests, against the real 53-species/38-reaction/
-109-parameter model) -- everything else in this suite uses small, synthetic fixtures.
+115-parameter model, produced by Agent 2's own canonical ``run_agent2_pipeline`` entrypoint --
+Five-Agent Workflow V1 Hardening increment) -- everything else in this suite uses small,
+synthetic fixtures.
 """
 
 from __future__ import annotations
@@ -20,7 +22,7 @@ def test_real_sce00061_handoff_parses():
     handoff = parse_agent2_handoff(data)
     assert len(handoff.species) == 53
     assert len(handoff.reactions) == 38
-    assert len(handoff.parameters) == 109
+    assert len(handoff.parameters) == 115
     assert handoff.readiness == "EXECUTABLE"
 
 
@@ -61,5 +63,5 @@ def test_pipeline_never_mutates_the_input_handoff_dict():
 def test_heuristic_and_placeholder_counts_match_the_real_agent2_declaration():
     handoff = parse_agent2_handoff(load_real_sce00061_handoff())
     report = run_agent3_pipeline(handoff, run_perturbations=False)
-    assert len(report.heuristic_parameter_ids) == 88
+    assert len(report.heuristic_parameter_ids) == 107
     assert len(report.placeholder_parameter_ids) == 0

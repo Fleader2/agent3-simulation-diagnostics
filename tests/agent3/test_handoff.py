@@ -8,7 +8,8 @@ import pytest
 
 from app.agent3.errors import HandoffContractError
 from app.agent3.handoff import handoff_contract_version_mismatch, parse_agent2_handoff
-from tests.agent3.fixtures import minimal_handoff_dict
+from app.agent3.version import AGENT2_HANDOFF_CONTRACT_VERSION
+from tests.agent3.fixtures import load_real_sce00061_handoff, minimal_handoff_dict
 
 
 def test_valid_handoff_parses():
@@ -51,3 +52,14 @@ def test_parsing_never_mutates_the_input_dict():
     original = copy.deepcopy(data)
     parse_agent2_handoff(data)
     assert data == original
+
+
+def test_real_agent2_canonical_handoff_declares_the_expected_contract_version():
+    """Five-Agent Workflow V1 Hardening compatibility check: the real sce00061 artifact, as
+    produced by Agent 2's own canonical ``run_agent2_pipeline`` entrypoint, parses successfully
+    and declares exactly the one canonical contract version this repository now expects --
+    with no re-stamping, no alias, and no disclosed mismatch."""
+    data = load_real_sce00061_handoff()
+    assert data["contract_version"] == AGENT2_HANDOFF_CONTRACT_VERSION == "agent2-downstream-v1"
+    handoff = parse_agent2_handoff(data)
+    assert handoff_contract_version_mismatch(handoff) is None
