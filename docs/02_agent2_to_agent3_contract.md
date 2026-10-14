@@ -1,4 +1,4 @@
-# Agent 2 → Agent 3 Contract (`agent2-downstream-v1`)
+# Agent 2 → Agent 3 Contract (`agent2-downstream-v2`)
 
 This is the smallest stable input shape Agent 3 Version 1 requires from Agent 2, expressed as a
 plain, JSON-serializable dict (`app.agent3.handoff.parse_agent2_handoff` parses and validates it
@@ -10,21 +10,26 @@ boundary pattern (`app.agent2.handoff.translate_agent1_view_to_agent2` on the si
 only this documented data shape is shared, by convention.
 
 **Five-Agent Workflow V1 Hardening increment:** this contract's own version name was
-`"agent2-to-agent3-v1"` prior to this increment. It is now `"agent2-downstream-v1"` — the one
+`"agent2-to-agent3-v1"` prior to that increment. It became `"agent2-downstream-v1"` — the one
 canonical name Agent 2's own `AGENT2_DOWNSTREAM_CONTRACT_VERSION`
 (`app.agent2.pipeline.build_canonical_downstream_handoff` in `agent2-antimony-builder`) emits,
 and the exact same name Agents 4 and 5 now also expect for what has always been the identical
-real artifact shape. The shape itself is unchanged by this rename.
+real artifact shape. The shape itself was unchanged by that rename.
+
+**Human-Readable Antimony Naming and Provenance Separation increment:** bumped again,
+`"agent2-downstream-v1"` → `"agent2-downstream-v2"`, adding the `antimony_symbol_map` field
+below. See "Antimony identifier resolution" further down for why.
 
 ## Top-level fields
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `contract_version` | str | yes | Compared informationally against `app.agent3.version.AGENT2_HANDOFF_CONTRACT_VERSION` (`"agent2-downstream-v1"`). A mismatch is disclosed as a note on the report, never raised as an error — version reconciliation is deferred, exactly as the Agent 1 → Agent 2 boundary's own `AGENT1_HANDOFF_VERSION` precedent. |
+| `contract_version` | str | yes | Compared informationally against `app.agent3.version.AGENT2_HANDOFF_CONTRACT_VERSION` (`"agent2-downstream-v2"`). A mismatch is disclosed as a note on the report, never raised as an error — version reconciliation is deferred, exactly as the Agent 1 → Agent 2 boundary's own `AGENT1_HANDOFF_VERSION` precedent. |
 | `model_id` | str | yes | Agent 2's own model identifier, carried through verbatim onto `Agent3Report.agent2_model_id`. |
 | `network_id` | str | yes | Agent 2's own network identifier. |
 | `antimony_text` | str | yes | The actual, compilable Antimony source. The *only* field handed to the simulation engine itself; everything else is metadata for provenance/diagnostics. |
 | `antimony_generator_version` | str | yes | Agent 2's own generator version marker, carried through for traceability. |
+| `antimony_symbol_map` | object | no (default `{"species": {}, "reactions": {}, "parameters": {}}`) | New in v2. Agent 2's own exact canonical-id → real, compiled Antimony-symbol mapping, one dict per category. See "Antimony identifier resolution" below. |
 | `readiness` | str | yes | Agent 2's own verdict on whether it claims this model is executable (e.g. `"EXECUTABLE"`). Carried through verbatim, never re-inferred from the Antimony text. |
 | `unresolved_reaction_ids` | list[str] | no (default `[]`) | Reactions Agent 2 itself flagged as unresolved. |
 | `unresolved_kinetic_law_ids` | list[str] | no (default `[]`) | Kinetic laws Agent 2 itself flagged as unresolved. |
@@ -136,33 +141,44 @@ finding that cites this parameter.
 Agent 2's own disclosed assumptions, carried through unchanged so a diagnostic finding can cite
 the exact Agent 2 assumption text it corroborates, never re-deriving or rephrasing it.
 
-## Antimony identifier sanitization (not part of the dict shape, but part of the contract)
+## Antimony identifier resolution (`antimony_symbol_map`)
 
-Agent 2's Antimony generator sanitizes every entity id into an Antimony-legal identifier: strip
-every character outside `[A-Za-z0-9_]` (replacing with `_`), then prefix by structural category
-(`c_` compartments, `s_` species, `p_` parameters, `J_` reactions). Agent 3 re-implements this
-same, documented, public rule independently in `app.agent3.antimony_ids` (never by importing
-Agent 2's code) so that a diagnostic finding or perturbation target — both expressed in terms of
-the raw entity ids above — can be mapped onto the identifiers the *compiled* model actually uses.
-Every candidate identifier this produces is verified against the already-loaded model's own real
-identifier list before being used; an unresolved candidate is reported as a
-`MODEL_STRUCTURE`-category finding, never silently assumed correct or silently skipped.
+**Human-Readable Antimony Naming and Provenance Separation increment (Agent 2).** Agent 2's
+Antimony generator now prefers a component's own curated biological name over its raw
+canonical id when choosing its Antimony symbol (`app.agent2.antimony.naming` on the sibling
+`agent2-antimony-builder` repository) — a UUID-derived symbol is a fallback only. A symbol can
+therefore no longer be correctly re-derived from a bare entity id by any rule Agent 3 could
+re-implement on its own; **Antimony symbol assignment is Agent 2-owned data.**
 
-## Two real interface frictions discovered and resolved (both inside Agent 3, no Agent 2 change)
+`antimony_symbol_map` is Agent 2's own exact mapping, read directly rather than re-derived:
+`{"species": {species_id: antimony_symbol}, "reactions": {...}, "parameters": {...}}`. A
+diagnostic finding or perturbation target, expressed in the raw entity-id terms used
+throughout this contract, resolves to the identifier the *compiled* model actually uses via a
+direct lookup in this map — never a guess, never a sanitization rule applied locally. A lookup
+miss (an id with no entry — including every entry when talking to a pre-v2 handoff, where this
+field defaults to empty) is reported as a `MODEL_STRUCTURE`-category finding, never silently
+assumed correct or silently skipped, exactly as an unresolved candidate already was before this
+increment.
 
-1. **Antimony identifier mismatch.** Raw Agent 2 entity ids (UUID-like strings) are not valid
-   Antimony identifiers and are not what the compiled model uses as symbol names — using them
-   directly as RoadRunner lookup keys resolved nothing. Fixed entirely within Agent 3 by
-   `app.agent3.antimony_ids`, re-deriving Agent 2's own already-documented sanitization rule.
+This repository's former `app.agent3.antimony_ids` module — an independent re-implementation
+of Agent 2's *old* id-only naming rule — is removed entirely. It worked only as long as Agent
+2's own rule stayed a pure function of the raw id, and silently broke the moment that stopped
+being true; keeping two copies of the same derivation rule in two repositories was the real
+defect, not any one specific sanitization detail.
+
+## Two real interface frictions, now resolved by reading Agent 2's own data
+
+1. **Antimony identifier mismatch.** Raw Agent 2 entity ids (UUID-like strings, or now a
+   curated biological name) are not valid Antimony identifiers and are not what the compiled
+   model uses as symbol names — using them directly as RoadRunner lookup keys resolves
+   nothing. Resolved via a direct lookup in `antimony_symbol_map` (see above) — previously via
+   `app.agent3.antimony_ids`'s own local re-derivation, before that module existed.
 2. **Trajectory/state key mismatch.** A loaded model's own trajectory and state dicts are keyed
-   by the sanitized Antimony identifier, not the original Agent 2 entity id — left unmapped, this
-   would have silently broken every `related_species_ids` provenance trace for a real handoff.
-   Fixed entirely within Agent 3 by threading an `id_map` (built via
-   `app.agent3.antimony_ids.build_species_antimony_id_map`) through
+   by the real Antimony identifier, not the original Agent 2 entity id — left unmapped, this
+   would silently break every `related_species_ids` provenance trace for a real handoff. Fixed
+   by threading an `id_map` (built via `app.agent3.handoff.species_antimony_id_map`, the
+   reverse of `antimony_symbol_map.species`) through
    `app.agent3.simulation.run_baseline_simulation`/`attempt_steady_state`.
-
-Neither required a code change to `agent2-antimony-builder`; both are resolved by Agent 3
-correctly re-deriving a convention Agent 2 already documents and exposes.
 
 ## A known, disclosed upstream scope gap (not an interface defect)
 

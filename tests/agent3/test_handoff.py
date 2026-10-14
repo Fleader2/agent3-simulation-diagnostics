@@ -60,6 +60,6 @@ def test_real_agent2_canonical_handoff_declares_the_expected_contract_version():
     and declares exactly the one canonical contract version this repository now expects --
     with no re-stamping, no alias, and no disclosed mismatch."""
     data = load_real_sce00061_handoff()
-    assert data["contract_version"] == AGENT2_HANDOFF_CONTRACT_VERSION == "agent2-downstream-v1"
+    assert data["contract_version"] == AGENT2_HANDOFF_CONTRACT_VERSION == "agent2-downstream-v2"
     handoff = parse_agent2_handoff(data)
     assert handoff_contract_version_mismatch(handoff) is None

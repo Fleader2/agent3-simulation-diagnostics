@@ -14,9 +14,8 @@ from __future__ import annotations
 
 import uuid
 
-from app.agent3.antimony_ids import build_species_antimony_id_map
 from app.agent3.diagnostics import run_all_diagnostics
-from app.agent3.handoff import Agent2Handoff
+from app.agent3.handoff import Agent2Handoff, species_antimony_id_map
 from app.agent3.loader import load_antimony_model
 from app.agent3.perturbation import (
     run_perturbation_smoke_tests,
@@ -70,7 +69,7 @@ def run_agent3_pipeline(
             perturbations=(),
         )
 
-    id_map = build_species_antimony_id_map([s.species_id for s in handoff.species])
+    id_map = species_antimony_id_map(handoff)
     simulation = run_baseline_simulation(load_result.roadrunner_instance, request, id_map=id_map)
     steady_state = attempt_steady_state(load_result.roadrunner_instance, id_map=id_map)
     diagnostics = run_all_diagnostics(handoff, simulation, steady_state)

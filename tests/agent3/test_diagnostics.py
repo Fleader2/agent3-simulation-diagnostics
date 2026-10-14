@@ -10,7 +10,6 @@ Every other rule here is tested against a real loaded/simulated model.
 
 from __future__ import annotations
 
-from app.agent3.antimony_ids import build_species_antimony_id_map
 from app.agent3.diagnostics import (
     conservation_findings,
     divergent_trajectory_findings,
@@ -38,7 +37,10 @@ def _simulate(text, *, end_time=2, num_points=5, species_ids=("S1",), **request_
     request = SimulationRequest(
         request_id="d", start_time=0, end_time=end_time, num_points=num_points, **request_kwargs
     )
-    id_map = build_species_antimony_id_map(list(species_ids))
+    # These fixtures' own species symbols are always "s_<species_id>" (see
+    # tests/agent3/fixtures.py's own docstring) -- building the reverse map directly here
+    # mirrors what a real handoff's own antimony_symbol_map would resolve to.
+    id_map = {f"s_{sid}": sid for sid in species_ids}
     return run_baseline_simulation(load_result.roadrunner_instance, request, id_map=id_map)
 
 

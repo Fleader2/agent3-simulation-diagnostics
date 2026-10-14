@@ -16,6 +16,15 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
   was already the identical real artifact shape. Not a guarantee that every Agent 2 contract
   version is compatible -- version reconciliation is deferred, exactly as the Agent 1 -> Agent 2
   boundary's own ``AGENT1_HANDOFF_VERSION`` documents.
+
+  **Human-Readable Antimony Naming and Provenance Separation increment (Agent 2):** bumped
+  ``"agent2-downstream-v1"`` -> ``"agent2-downstream-v2"``. Agent 2's generated Antimony symbols
+  now prefer a curated biological name over a bare id, which this repository's own former
+  ``app.agent3.antimony_ids`` module -- an independent re-implementation of Agent 2's *old*
+  id-only naming rule -- could no longer resolve correctly. That module is removed entirely:
+  Agent 2's own ``antimony_symbol_map`` field (new in v2) is the one source of truth for
+  resolving a handoff entity id to its real, compiled Antimony identifier. See
+  ``app.agent3.handoff.Agent2Handoff.antimony_symbol_map``.
 * ``SIMULATION_POLICY_VERSION`` -- the version of the baseline-simulation configuration
   policy (integrator choice, tolerances, default horizon/step count).
 * ``DIAGNOSTIC_POLICY_VERSION`` -- the version of the diagnostic rule set (numerical
@@ -27,7 +36,7 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
 from __future__ import annotations
 
 AGENT3_CONTRACT_VERSION = "0.1"
-AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-downstream-v1"
+AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-downstream-v2"
 SIMULATION_POLICY_VERSION = "simulation-v1"
 DIAGNOSTIC_POLICY_VERSION = "diagnostic-v1"
 PERTURBATION_POLICY_VERSION = "perturbation-v1"

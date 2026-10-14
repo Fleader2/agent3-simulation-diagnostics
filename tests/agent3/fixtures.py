@@ -13,11 +13,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-#: Identifiers here deliberately mirror Agent 2's own real, documented Antimony naming
-#: convention (``p_<parameter_id>``/``s_<species_id>``, ``app.agent2.antimony.naming`` on the
-#: sibling ``agent2-antimony-builder`` repository) rather than the bare ``S1``/``k1`` a human
-#: would write by hand -- so these fixtures exercise ``app.agent3.antimony_ids``'s own
-#: candidate-id resolution exactly as the real sce00061 integration does, never bypassing it.
+#: Identifiers here deliberately mirror Agent 2's own real Antimony naming convention
+#: (``p_<parameter_id>``/``s_<species_id>``, ``app.agent2.antimony.naming`` on the sibling
+#: ``agent2-antimony-builder`` repository) rather than the bare ``S1``/``k1`` a human would
+#: write by hand -- so ``minimal_handoff_dict``'s own ``antimony_symbol_map`` below resolves
+#: these fixtures' targets exactly as the real sce00061 integration does, never bypassing it.
 VALID_DECAY_ANTIMONY = """
 model valid_decay
   compartment C = 1
@@ -90,11 +90,16 @@ def minimal_handoff_dict(**overrides) -> dict:
     need the full real ``sce00061`` fixture. One reaction, one species, one parameter, one
     model assumption -- enough to exercise provenance tracing end to end."""
     base = {
-        "contract_version": "agent2-downstream-v1",
+        "contract_version": "agent2-downstream-v2",
         "model_id": "test-model-1",
         "network_id": "test-network-1",
         "antimony_text": VALID_DECAY_ANTIMONY,
         "antimony_generator_version": "test-generator-v0",
+        "antimony_symbol_map": {
+            "species": {"S1": "s_S1"},
+            "reactions": {"reaction-1": "J1"},
+            "parameters": {"k1": "p_k1"},
+        },
         "readiness": "EXECUTABLE",
         "unresolved_reaction_ids": [],
         "unresolved_kinetic_law_ids": [],

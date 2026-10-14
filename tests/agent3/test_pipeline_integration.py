@@ -2,9 +2,19 @@
 
 This is the one test module allowed to be genuinely slow/real (it runs the full baseline
 workflow, including 10 perturbation smoke tests, against the real 53-species/38-reaction/
-115-parameter model, produced by Agent 2's own canonical ``run_agent2_pipeline`` entrypoint --
+91-parameter model, produced by Agent 2's own canonical ``run_agent2_pipeline`` entrypoint --
 Five-Agent Workflow V1 Hardening increment) -- everything else in this suite uses small,
 synthetic fixtures.
+
+**Human-Readable Antimony Naming and Provenance Separation increment:** this fixture
+(``tests/fixtures/sce00061_agent2_handoff.json``) was regenerated from a fresh, real run of
+the same live organism to pick up the new ``antimony_symbol_map``/``agent2-downstream-v2``
+fields. The underlying curated data had itself genuinely drifted since this fixture was last
+captured (unrelated curation work in the sibling ``agent1-biochemical-curator`` repository
+between then and now) -- the parameter count dropped from a previously-recorded 115 to the
+current, real 91 (84 heuristic, 7 literature-derived); the species/reaction counts (53/38) are
+unchanged. This is disclosed here, not silently absorbed, since it is a real change to what
+this fixture represents, even though it has nothing to do with Antimony naming itself.
 """
 
 from __future__ import annotations
@@ -22,7 +32,7 @@ def test_real_sce00061_handoff_parses():
     handoff = parse_agent2_handoff(data)
     assert len(handoff.species) == 53
     assert len(handoff.reactions) == 38
-    assert len(handoff.parameters) == 115
+    assert len(handoff.parameters) == 91
     assert handoff.readiness == "EXECUTABLE"
 
 
@@ -63,5 +73,5 @@ def test_pipeline_never_mutates_the_input_handoff_dict():
 def test_heuristic_and_placeholder_counts_match_the_real_agent2_declaration():
     handoff = parse_agent2_handoff(load_real_sce00061_handoff())
     report = run_agent3_pipeline(handoff, run_perturbations=False)
-    assert len(report.heuristic_parameter_ids) == 107
+    assert len(report.heuristic_parameter_ids) == 84
     assert len(report.placeholder_parameter_ids) == 0

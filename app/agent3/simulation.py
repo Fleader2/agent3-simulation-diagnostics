@@ -53,13 +53,14 @@ def run_baseline_simulation(
     state afterward).
 
     ``id_map`` (``{antimony_species_id: original_agent2_species_id}``, typically
-    ``app.agent3.antimony_ids.build_species_antimony_id_map``'s own output) relabels every
-    trajectory/state dict key back to the original Agent 2 entity id before returning --
-    without it (the default), keys are RoadRunner's own real Antimony identifiers verbatim,
-    which is correct for a synthetic/hand-written model but would break provenance tracing for
-    a real Agent 2 handoff, whose own ids are sanitized before becoming Antimony identifiers
-    (see ``app.agent3.antimony_ids``'s own docstring). A key with no entry in ``id_map`` is left
-    as-is, never dropped.
+    ``app.agent3.handoff.species_antimony_id_map``'s own output -- the reverse of Agent 2's own
+    ``antimony_symbol_map`` contract field) relabels every trajectory/state dict key back to
+    the original Agent 2 entity id before returning -- without it (the default), keys are
+    RoadRunner's own real Antimony identifiers verbatim, which is correct for a synthetic/
+    hand-written model but would break provenance tracing for a real Agent 2 handoff, whose
+    own ids are rendered as human-readable Antimony symbols by Agent 2
+    (``app.agent2.antimony.naming`` on the sibling repository) rather than being usable
+    verbatim. A key with no entry in ``id_map`` is left as-is, never dropped.
     """
     rr.integrator.setValue("relative_tolerance", request.relative_tolerance)
     rr.integrator.setValue("absolute_tolerance", request.absolute_tolerance)

@@ -16,13 +16,8 @@ written, and each perturbation's change lives solely in its own throwaway RoadRu
 
 from __future__ import annotations
 
-from app.agent3.antimony_ids import (
-    build_species_antimony_id_map,
-    candidate_parameter_antimony_id,
-    candidate_species_antimony_id,
-)
 from app.agent3.diagnostics import run_all_diagnostics
-from app.agent3.handoff import Agent2Handoff
+from app.agent3.handoff import Agent2Handoff, species_antimony_id_map
 from app.agent3.loader import load_antimony_model
 from app.agent3.simulation import run_baseline_simulation
 from app.agent3.types import (
@@ -120,13 +115,13 @@ def run_perturbation(
 
     rr = load_result.roadrunner_instance
     if spec.target_kind == "PARAMETER":
-        candidate = candidate_parameter_antimony_id(spec.target_id)
+        candidate = handoff.antimony_symbol_map.parameters.get(spec.target_id)
         real_ids = set(rr.model.getGlobalParameterIds())
     else:
-        candidate = candidate_species_antimony_id(spec.target_id)
+        candidate = handoff.antimony_symbol_map.species.get(spec.target_id)
         real_ids = set(rr.model.getFloatingSpeciesIds())
 
-    if candidate not in real_ids:
+    if candidate is None or candidate not in real_ids:
         unresolved_finding = DiagnosticFinding(
             finding_id=f"perturbation-target-unresolved:{spec.target_kind}:{spec.target_id}",
             category=DiagnosticCategory.MODEL_STRUCTURE,
@@ -136,9 +131,9 @@ def run_perturbation(
                 f"(candidate Antimony id {candidate!r}) against the loaded model."
             ),
             explanation=(
-                "The candidate identifier, derived by re-applying Agent 2's own documented "
-                "Antimony sanitization rule to this handoff entity id, does not appear among "
-                "the loaded model's own real identifiers. This is reported rather than "
+                "Agent 2's own antimony_symbol_map carried no entry for this handoff entity "
+                "id (or the entry it carried does not appear among the loaded model's own "
+                "real identifiers). This is reported rather than "
                 "guessed at -- no perturbation was applied for this target."
             ),
             related_parameter_ids=(spec.target_id,) if spec.target_kind == "PARAMETER" else (),
@@ -175,7 +170,7 @@ def run_perturbation(
             ),
         )
 
-    id_map = build_species_antimony_id_map([s.species_id for s in handoff.species])
+    id_map = species_antimony_id_map(handoff)
     sim = run_baseline_simulation(rr, baseline_request, id_map=id_map)
     findings = run_all_diagnostics(handoff, sim)
 
