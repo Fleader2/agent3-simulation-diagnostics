@@ -8,7 +8,7 @@ synthetic fixtures.
 
 **Human-Readable Antimony Naming and Provenance Separation increment:** this fixture
 (``tests/fixtures/sce00061_agent2_handoff.json``) was regenerated from a fresh, real run of
-the same live organism to pick up the new ``antimony_symbol_map``/``agent2-downstream-v2``
+the same live organism to pick up the new ``antimony_symbol_map``/``agent2-downstream-v3``
 fields. The underlying curated data had itself genuinely drifted since this fixture was last
 captured (unrelated curation work in the sibling ``agent1-biochemical-curator`` repository
 between then and now) -- the parameter count dropped from a previously-recorded 115 to the

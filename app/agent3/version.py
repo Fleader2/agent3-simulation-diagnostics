@@ -25,6 +25,16 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
   Agent 2's own ``antimony_symbol_map`` field (new in v2) is the one source of truth for
   resolving a handoff entity id to its real, compiled Antimony identifier. See
   ``app.agent3.handoff.Agent2Handoff.antimony_symbol_map``.
+
+  **Explicit Enzyme Concentration Representation increment (Agent 2):** bumped
+  ``"agent2-downstream-v2"`` -> ``"agent2-downstream-v3"``, mirroring Agent 2's own real bump.
+  Agent 2's handoff ``species[]`` gained ``source_protein_id`` (set only for an explicit
+  catalytic-enzyme species) and ``kinetic_laws[]`` gained ``rate_law_scope``
+  (``"EXPLICIT_ENZYME_CONCENTRATION"``/``"LUMPED_EFFECTIVE_RATE"``) -- both purely additive;
+  this repository's own ``app.agent3.handoff`` parses every species/kinetic-law dict via
+  ``.get(...)`` with no extra-key rejection, so the version bump alone (this repository does
+  not yet read either new field) keeps parsing correct. Consuming them for Agent 3's own
+  diagnostics is deferred to a future increment.
 * ``SIMULATION_POLICY_VERSION`` -- the version of the baseline-simulation configuration
   policy (integrator choice, tolerances, default horizon/step count).
 * ``DIAGNOSTIC_POLICY_VERSION`` -- the version of the diagnostic rule set (numerical
@@ -36,7 +46,7 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
 from __future__ import annotations
 
 AGENT3_CONTRACT_VERSION = "0.1"
-AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-downstream-v2"
+AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-downstream-v3"
 SIMULATION_POLICY_VERSION = "simulation-v1"
 DIAGNOSTIC_POLICY_VERSION = "diagnostic-v1"
 PERTURBATION_POLICY_VERSION = "perturbation-v1"
