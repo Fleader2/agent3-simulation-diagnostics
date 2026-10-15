@@ -44,6 +44,21 @@ def test_parameter_perturbation_changes_the_decay_rate_and_final_state():
     assert result.max_relative_change_in_final_state > 0
 
 
+def test_relative_change_by_species_is_consistent_with_the_max_scalar():
+    """Functional Modularity Criteria increment: ``relative_change_by_species`` discloses the
+    exact per-species values ``max_relative_change_in_final_state`` was already derived from --
+    never a second, independently-computed number."""
+    handoff = parse_agent2_handoff(minimal_handoff_dict())
+    spec = PerturbationSpec(target_kind="PARAMETER", target_id="k1", fraction=0.10)
+    result = run_perturbation(handoff, spec, DEFAULT_SIMULATION_REQUEST)
+    assert result.relative_change_by_species is not None
+    assert "S1" in result.relative_change_by_species
+    assert (
+        max(result.relative_change_by_species.values())
+        == result.max_relative_change_in_final_state
+    )
+
+
 def test_perturbation_is_deterministic_across_repeated_runs():
     handoff = parse_agent2_handoff(minimal_handoff_dict())
     spec = PerturbationSpec(target_kind="PARAMETER", target_id="k1", fraction=0.10)

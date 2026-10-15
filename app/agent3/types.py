@@ -173,7 +173,18 @@ class PerturbationSpec:
 
 @dataclass(frozen=True, slots=True)
 class PerturbationResult:
-    """The outcome of one ``PerturbationSpec`` smoke test."""
+    """The outcome of one ``PerturbationSpec`` smoke test.
+
+    ``relative_change_by_species`` (Functional Modularity Criteria increment) discloses the
+    identical per-species relative-change values ``max_relative_change_in_final_state`` was
+    always already computed from, before collapsing them to that one scalar -- never a new
+    computation, only exposing data this package already derived internally. Agent 2's own
+    dynamic-isolation/sensitivity-coherence criteria need the *per-species* breakdown (which
+    species moved, not just how much the single worst one moved) to distinguish effects that
+    stay within one candidate module from effects that spill into another. ``None`` only when
+    no final-state comparison was possible at all (identical condition to
+    ``max_relative_change_in_final_state is None``).
+    """
 
     spec: PerturbationSpec
     baseline_value: float
@@ -181,6 +192,7 @@ class PerturbationResult:
     simulation_status: SimulationStatus
     remained_numerically_stable: bool
     max_relative_change_in_final_state: float | None = None
+    relative_change_by_species: dict[str, float] | None = None
     findings: tuple[DiagnosticFinding, ...] = ()
 
 

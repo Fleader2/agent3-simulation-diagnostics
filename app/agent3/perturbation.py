@@ -180,6 +180,7 @@ def run_perturbation(
     )
 
     max_relative_change: float | None = None
+    relative_change_by_species: dict[str, float] | None = None
     if sim.final_state is not None:
         # Compare against the *unperturbed* baseline final state by running it once more under
         # identical conditions from a second fresh instance -- never reusing a cached baseline
@@ -190,12 +191,13 @@ def run_perturbation(
                 baseline_load.roadrunner_instance, baseline_request, id_map=id_map
             )
             if baseline_sim.final_state is not None:
-                diffs = []
+                diffs: dict[str, float] = {}
                 for species_id, perturbed_final in sim.final_state.items():
                     base_final = baseline_sim.final_state.get(species_id, 0.0)
                     denom = abs(base_final) if base_final != 0 else 1.0
-                    diffs.append(abs(perturbed_final - base_final) / denom)
-                max_relative_change = max(diffs) if diffs else 0.0
+                    diffs[species_id] = abs(perturbed_final - base_final) / denom
+                relative_change_by_species = diffs
+                max_relative_change = max(diffs.values()) if diffs else 0.0
 
     return PerturbationResult(
         spec=spec,
@@ -204,6 +206,7 @@ def run_perturbation(
         simulation_status=sim.status,
         remained_numerically_stable=remained_stable,
         max_relative_change_in_final_state=max_relative_change,
+        relative_change_by_species=relative_change_by_species,
         findings=findings,
     )
 

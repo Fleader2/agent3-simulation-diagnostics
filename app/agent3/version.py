@@ -41,15 +41,29 @@ changes -- mirrors ``app.agent2.version``'s own identical convention on the sibl
   pathology detection, conservation/mass-balance checks, provenance-tracing rules).
 * ``PERTURBATION_POLICY_VERSION`` -- the version of the Version 1 perturbation smoke-test
   policy (which quantities are perturbed, by how much, and what "materially different" means).
+
+**Functional Modularity Criteria from Agents 3 and 4 increment:** ``PerturbationResult`` gained
+one new, additive field, ``relative_change_by_species`` -- the per-species relative-change
+values ``max_relative_change_in_final_state`` was already computing internally and discarding
+down to one scalar. No new computation: the identical ``diffs`` this module already derived is
+now kept and returned instead of only its own ``max()``. ``AGENT3_CONTRACT_VERSION`` bumped
+``"0.1"`` -> ``"0.2"`` (a real, if additive, ``Agent3Report``-nested shape change).
+``PERTURBATION_POLICY_VERSION`` bumped ``"perturbation-v1"`` -> ``"perturbation-v2"`` -- the
+policy of *what this module discloses* about an already-run perturbation changed, even though
+the perturbation itself runs identically. ``run_agent3_pipeline`` itself (``app.agent3
+.pipeline``) is unchanged -- it already accepted an explicit ``perturbation_specs`` override;
+Agent 2's own new functional-evaluation requests (routed through a new, focused Harness-side
+runner, never through this repository's own existing ``run_agent3.py`` whole-pipeline script)
+simply supply their own target battery through that already-existing parameter.
 """
 
 from __future__ import annotations
 
-AGENT3_CONTRACT_VERSION = "0.1"
+AGENT3_CONTRACT_VERSION = "0.2"
 AGENT2_HANDOFF_CONTRACT_VERSION = "agent2-downstream-v3"
 SIMULATION_POLICY_VERSION = "simulation-v1"
 DIAGNOSTIC_POLICY_VERSION = "diagnostic-v1"
-PERTURBATION_POLICY_VERSION = "perturbation-v1"
+PERTURBATION_POLICY_VERSION = "perturbation-v2"
 
 __all__ = [
     "AGENT2_HANDOFF_CONTRACT_VERSION",
